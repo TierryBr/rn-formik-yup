@@ -1,6 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TextInput, Button, TouchableOpacity } from 'react-native';
 import { useFormik, Form, Field, Formik } from 'formik';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import * as Yup from 'yup';
 
@@ -8,13 +9,12 @@ const schema = Yup.object().shape({
   user: Yup.string().min(2, 'O usuário deve ter pelo menos 2 caracteres').required('O usuário é obrigatório'),
   email: Yup.string().email('Email inválido').required('O e-mail é obrigatório'),
   phone: Yup.string().required('O telefone é obrigatório'),
-  cpf: Yup.number().max(11, 'O cpf não pode ter mais de 11 números')
-    .min(11, 'O cpf deve ter pelo menos 11 números').required('O cpf é obrigatório'),
+  cpf: Yup.number().required('O cpf é obrigatório'),
   password: Yup.string().min(6, 'A senha deve ter pelo menos 6 caracteres').required('Senha é obrigatória'),
 });
 
-export default function Register() {
-  const navigation = useNavigation();
+export default function Register({navigation}) {
+  // const navigation = useNavigation();
 
   const registerInfo = {
     user: '',
@@ -28,13 +28,18 @@ export default function Register() {
     <View style={styles.container} >
       <Text style={styles.title}>Tela de Cadastro</Text>
 
-      <Formik initialValues={registerInfo} validationSchema={schema} onSubmit={(values, formikActions) => {
+      <Formik initialValues={registerInfo} validationSchema={schema} onSubmit={async (values, formikActions) => {
         // salvar no asyncStorage
+        try {
+          await AsyncStorage.setItem('keyRegister', JSON.stringify(values));
+          await navigation.navigate('Login');
+        } catch (e) {
+          alert(e)
+        }
         formikActions.resetForm();
         navigation.navigate('Login');
       }}>
         {({values, errors, touched, handleChange, handleBlur, handleSubmit}) => {
-          console.log(errors.email);
           const {user, email, phone, cpf, password} = values;
           return (
             <>

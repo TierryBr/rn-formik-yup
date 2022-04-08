@@ -1,23 +1,39 @@
+import React, {useState, useEffect} from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, TextInput, Button, TouchableOpacity } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useFormik, Form, Field, Formik } from 'formik';
-import { useNavigation } from '@react-navigation/native';
+import { useIsFocused } from '@react-navigation/native';
 import * as Yup from 'yup';
 
 const schema = Yup.object().shape({
-  email: Yup.string().email('Email inválido').required('O e-mail é obrigatório'),
+  user: Yup.string().required('O usuário é obrigatório'),
   password: Yup.string().min(6, 'A senha deve ter pelo menos 6 caracteres').required('Senha é obrigatória'),
 });
 
-export default function Login() {
-  const navigation = useNavigation();
+export default function Login({navigation}) {
+  const [userLogin, setUSerLogin] = useState(null);
+
+  const isFocused = useIsFocused();
+
+  useEffect(() => {
+    async function getUser() {
+      if(isFocused) {
+        const response = await AsyncStorage.getItem('keyRegister'); 
+        const json = JSON.parse(response);
+        setUSerLogin(json);
+      }
+    }
+    getUser();
+  }, [isFocused]);
+
 
   const navigateToProfile = () => {
     navigation.navigate('Profile');
   }
 
   const loginInfo = {
-    email: '',
+    user: '',
     password: '',
   }
 
@@ -25,23 +41,31 @@ export default function Login() {
     <View style={styles.container} >
       <Text style={styles.title}>Tela de login</Text>
 
-      <Formik initialValues={loginInfo} validationSchema={schema} onSubmit={(values, formikActions) => {
+      <Formik initialValues={loginInfo} validationSchema={schema} onSubmit={async (values, formikActions) => {
         // salvar no asyncStorage
-        formikActions.resetForm();
-        navigation.navigate('Profile');
+        if (userLogin.user === values.user && userLogin.password === values.password) {
+          try {
+            await AsyncStorage.setItem('keyLogin', JSON.stringify(values));
+            await navigation.navigate('Profile');
+          } catch (e) {
+            alert(e)
+          }
+          formikActions.resetForm();
+        } else {
+          alert('user ou senha invalidos');
+        }
       }}>
         {({values, errors, touched, handleChange, handleBlur, handleSubmit}) => {
-          console.log(errors.email)
-          const {email, password} = values;
+          const {user, password} = values;
           return (
             <>
-              {errors.email && touched.email ? <Text style={styles.error}>{errors.email}</Text> : null}
+              {errors.user && touched.user ? <Text style={styles.error}>{errors.user}</Text> : null}
               <TextInput 
                 style={styles.input} 
-                placeholder="Digite seu email" 
-                value={email} 
-                onChangeText={handleChange('email')}
-                onBlur={handleBlur('email')}
+                placeholder="Digite seu usuário" 
+                value={user} 
+                onChangeText={handleChange('user')}
+                onBlur={handleBlur('user')}
               />
               {errors.password && touched.password ? <Text style={styles.error}>{errors.password}</Text> : null}
               <TextInput 
