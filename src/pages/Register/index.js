@@ -1,9 +1,9 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TextInput, Button, TouchableOpacity } from 'react-native';
-import { useFormik, Form, Field, Formik } from 'formik';
+import { Text, View, TextInput, Button, TouchableOpacity } from 'react-native';
+import { Formik } from 'formik';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
 import * as Yup from 'yup';
+
+import styles from './styles';
 
 const schema = Yup.object().shape({
   user: Yup.string().min(2, 'O usuário deve ter pelo menos 2 caracteres').required('O usuário é obrigatório'),
@@ -14,7 +14,6 @@ const schema = Yup.object().shape({
 });
 
 export default function Register({navigation}) {
-  // const navigation = useNavigation();
 
   const registerInfo = {
     user: '',
@@ -29,7 +28,6 @@ export default function Register({navigation}) {
       <Text style={styles.title}>Tela de Cadastro</Text>
 
       <Formik initialValues={registerInfo} validationSchema={schema} onSubmit={async (values, formikActions) => {
-        // salvar no asyncStorage
         try {
           await AsyncStorage.setItem('keyRegister', JSON.stringify(values));
           await navigation.navigate('Login');
@@ -98,47 +96,4 @@ export default function Register({navigation}) {
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#66fe',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
-    padding: 15,
-  },
-  input: {
-    marginTop: 10,
-    width: 300,
-    backgroundColor: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-    borderRadius: 3,
-    padding: 10,
-  },
-  button: {
-    width: 300,
-    height: 42,
-    backgroundColor: '#fff9',
-    borderRadius: 4,
-    marginTop: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  buttonText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  error: {
-    width: 300,
-    fontSize: 15,
-    marginTop: 15,
-    color: '#e03e36',
-    justifyContent: 'flex-end',
-  }
-});
+

@@ -1,9 +1,10 @@
 import React, {useState, useEffect} from 'react';
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TextInput, Button } from 'react-native';
+import { Text, View, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export default function Login() {
+import styles from './styles';
+
+export default function Login({navigation}) {
   const [user, setUSer] = useState(null);
 
   useEffect(() => {
@@ -19,21 +20,12 @@ export default function Login() {
   return (
     <View style={styles.container} >
       <Text style={styles.title}>Seja bem vindo, {user}</Text>
+
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Login')}>
+        <Text style={styles.buttonText}>Sair</Text>
+      </TouchableOpacity>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#66fe',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
-    padding: 15,
-  }
-});
+
