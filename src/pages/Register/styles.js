@@ -13,17 +13,6 @@ const styles = StyleSheet.create({
     color: '#fff',
     padding: 15,
   },
-  input: {
-    marginTop: 10,
-    width: 300,
-    backgroundColor: '#fff',
-    borderWidth: 1,
-    borderColor: '#176087',
-    fontSize: 16,
-    fontWeight: 'bold',
-    borderRadius: 3,
-    padding: 10,
-  },
   button: {
     width: 300,
     height: 42,
@@ -37,13 +26,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     color: '#fff',
-  },
-  error: {
-    width: 300,
-    fontSize: 15,
-    marginTop: 15,
-    color: '#e03e36',
-    justifyContent: 'flex-end',
   }
 });
 

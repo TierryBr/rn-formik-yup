@@ -1,9 +1,10 @@
 import React, {useState, useEffect} from 'react';
-import { Text, View, TextInput, TouchableOpacity } from 'react-native';
+import { Text, View, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Formik } from 'formik';
 import { useIsFocused } from '@react-navigation/native';
 import * as Yup from 'yup';
+import TextInputForm from '../../components/TextInput/index';
 
 import styles from './styles';
 
@@ -34,42 +35,44 @@ export default function Login({navigation}) {
     password: '',
   }
 
+  async function onSubmit(values, formikActions) {
+    if (userLogin.user === values.user && userLogin.password === values.password) {
+      try {
+        await AsyncStorage.setItem('keyLogin', JSON.stringify(values));
+        await navigation.navigate('Profile');
+      } catch (e) {
+        alert(e)
+      }
+      formikActions.resetForm();
+    } else {
+      alert('usuários ou senha invalidos');
+    }
+  }
+
   return (
     <View style={styles.container} >
       <Text style={styles.title}>Tela de login</Text>
 
-      <Formik initialValues={loginInfo} validationSchema={schema} onSubmit={async (values, formikActions) => {
-        if (userLogin.user === values.user && userLogin.password === values.password) {
-          try {
-            await AsyncStorage.setItem('keyLogin', JSON.stringify(values));
-            await navigation.navigate('Profile');
-          } catch (e) {
-            alert(e)
-          }
-          formikActions.resetForm();
-        } else {
-          alert('usuários ou senha invalidos');
-        }
-      }}>
+      <Formik initialValues={loginInfo} validationSchema={schema} onSubmit={onSubmit}>
         {({values, errors, touched, handleChange, handleBlur, handleSubmit}) => {
           const {user, password} = values;
           return (
             <>
-              {errors.user && touched.user ? <Text style={styles.error}>{errors.user}</Text> : null}
-              <TextInput 
-                style={styles.input} 
-                placeholder="Digite seu usuário" 
+              <TextInputForm 
+                placeholder={"Digite seu usuário"} 
                 value={user} 
                 onChangeText={handleChange('user')}
                 onBlur={handleBlur('user')}
+                errors={errors.user}
+                touched={touched.user}
               />
-              {errors.password && touched.password ? <Text style={styles.error}>{errors.password}</Text> : null}
-              <TextInput 
-                style={styles.input} 
-                placeholder="Digite sua senha" 
+              <TextInputForm 
+                placeholder={"Digite sua senha"} 
                 value={password} 
                 onChangeText={handleChange('password')} 
                 onBlur={handleBlur('password')}
+                errors={errors.password}
+                touched={touched.password}
                 secureTextEntry={true}
               />
               <TouchableOpacity style={styles.button} isSubmit onPress={handleSubmit}>
